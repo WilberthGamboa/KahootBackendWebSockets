@@ -23,9 +23,10 @@
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
-    "@nestjs/platform-socket.io": "^10.3.2",
-    "@nestjs/websockets": "^10.3.2",
+    "@nestjs/platform-socket.io": "^10.3.3",
+    "@nestjs/websockets": "^10.3.3",
     "reflect-metadata": "^0.2.0",
+    "remove": "^0.1.5",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {

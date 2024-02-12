@@ -1,21 +1,38 @@
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Socket } from 'dgram';
-import { Server } from 'http';
+import { Socket,Server} from "socket.io";
+import { AuthService } from './auth.service';
+
 
 @WebSocketGateway({cors:true})
 export class AuthGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
-    return 'Hello world!';
-  }
 
-  handleConnection(client:any) {
+    constructor(private readonly authService: AuthService){
+
+    }
+
+    @WebSocketServer() wss:Server
+ 
+    @SubscribeMessage('message')
+     registerName(client:Socket,payload:any){
+       this.authService.registerName(client,payload)
+       this.wss.emit('clients-updated', this.authService.getConnectedClients() );
+      
+    }
+  async handleConnection(client:Socket) {
     // Handle connection event
+
     console.log('hola pete'+ client.id)
+    await this.authService.registerClient( client );
+    this.wss.emit('clients-updated', this.authService.getConnectedClients() );
+
   }
 
-  handleDisconnect(client: any) {
+  async handleDisconnect(client: Socket) {
     // Handle disconnection event
+    console.log('adios pete'+ client.id)
+    await this.authService.removeClient( client.id );
+    this.wss.emit('clients-updated', this.authService.getConnectedClients() );
   }
+
+  
 }
