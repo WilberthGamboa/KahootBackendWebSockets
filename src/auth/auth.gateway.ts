@@ -34,31 +34,38 @@ export class AuthGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.wss.emit('clients-updated', this.authService.getConnectedClients());
 
     if (this.authService.validateGameStart()) {
-      this.gameStart()
+      this.question()
     }
 
   }
 
 
-  gameStart() {  
-    let remainingSeconds = 10;
-
-    const countdownInterval = setInterval(() => {
-      this.wss.emit('gamestart', remainingSeconds);
-      remainingSeconds--;
-
-      if (remainingSeconds < 0) {
-        clearInterval(countdownInterval);
-     
-      }
-    }, 1000);
-    
-   
-
+  gameStart() {
+    return new Promise<void>((resolve, reject) => {
+      let remainingSeconds = 10;
+  
+      const countdown = () => {
+        if (remainingSeconds >= 0) {
+          this.wss.emit('gamestart', remainingSeconds);
+          remainingSeconds--;
+          setTimeout(countdown, 1000); // Espera 1 segundo antes de la próxima llamada recursiva
+        } else {
+          resolve(); // Resuelve la promesa cuando la cuenta regresiva termina
+        }
+      };
+  
+      countdown(); // Comienza la cuenta regresiva
+    });
+  }
+  
+  async question() {
+    for (let index = 0; index < 2; index++) {
+      await this.gameStart(); // Espera a que la cuenta regresiva actual termine antes de iniciar la siguiente
+      // Realiza otras acciones después de que la cuenta regresiva termine, si es necesario
+    }
+  }
   
 
-
-  }
 
 
 
