@@ -73,7 +73,7 @@ export class AuthService {
     }
 
     getQuestion(index:number){
-        this.questions[index];
+        return this.questions[index];
     }
     
 }

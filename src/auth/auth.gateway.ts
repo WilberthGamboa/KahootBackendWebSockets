@@ -60,7 +60,9 @@ export class AuthGateway implements OnGatewayConnection, OnGatewayDisconnect {
   
   async question() {
     for (let index = 0; index < 2; index++) {
-      await this.gameStart(); // Espera a que la cuenta regresiva actual termine antes de iniciar la siguiente
+      this.wss.emit('question',this.authService.getQuestion(index))
+      await this.gameStart();
+       // Espera a que la cuenta regresiva actual termine antes de iniciar la siguiente
       // Realiza otras acciones después de que la cuenta regresiva termine, si es necesario
     }
   }
