@@ -90,7 +90,11 @@ export class AuthService {
 
     sumatoriaPreguntas(client:Socket,valor:any,index:number){
         //Verificar si la respuesta es correcta
-        if (this.questions[index].respuestaCorrecta===Number(valor)) {
+       
+        const respuesta = this.questions[index].respuesta[this.questions[index].respuestaCorrecta]
+        console.log({respuesta})
+        console.log({valor})
+        if (Number(respuesta)===Number(valor)) {
             this.connectedClients[client.id].totalDeRespuestasCorrectas =  this.connectedClients[client.id].totalDeRespuestasCorrectas+1;
         }
         return this.connectedClients;

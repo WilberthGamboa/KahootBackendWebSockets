@@ -71,7 +71,7 @@ export class AuthGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('answer')
   answer(client: Socket, payload: any) {
     
-    this.authService.sumatoriaPreguntas(client,payload,this.indexGlobal)
+    this.authService.sumatoriaPreguntas(client,payload.name,this.indexGlobal)
     this.wss.emit('clients-updated',this.authService.getConnectedClients())
   }
 
