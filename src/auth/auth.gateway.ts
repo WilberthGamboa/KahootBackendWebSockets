@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 
 @WebSocketGateway({ cors: true })
 export class AuthGateway implements OnGatewayConnection, OnGatewayDisconnect {
-
+  private indexGlobal = 0;
   constructor(private readonly authService: AuthService) { }
   /*
 @WebSocketServer() wss:Server // permite enviar al front
@@ -60,13 +60,21 @@ export class AuthGateway implements OnGatewayConnection, OnGatewayDisconnect {
   
   async question() {
     for (let index = 0; index < 2; index++) {
+      this.indexGlobal= index;
       this.wss.emit('question',this.authService.getQuestion(index))
       await this.gameStart();
        // Espera a que la cuenta regresiva actual termine antes de iniciar la siguiente
       // Realiza otras acciones después de que la cuenta regresiva termine, si es necesario
     }
+    this.indexGlobal=0;
   }
-  
+  @SubscribeMessage('answer')
+  answer(client: Socket, payload: any) {
+    
+    this.authService.sumatoriaPreguntas(client,payload,this.indexGlobal)
+    this.wss.emit('clients-updated',this.authService.getConnectedClients())
+  }
+
 
 
 

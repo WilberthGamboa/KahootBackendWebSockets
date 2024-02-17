@@ -1,21 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { BadGatewayException, Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 interface ConnectedClients {
     [id: string]: {
      
         name:string
-       
+        totalDeRespuestasCorrectas:number
     }
 }
 interface Question {
     pregunta:string;
     respuesta:string[],
     respuestaCorrecta:number
+    
 }
 
 @Injectable()
 export class AuthService {
     private connectedClients: ConnectedClients = {}
+    private gameStart = false;
     private questions:Question[] = [
         {
             pregunta:'¿Cuanto es 2+2?',
@@ -40,11 +42,17 @@ export class AuthService {
     ]
  
     async registerClient(client:Socket){
-        this.connectedClients[client.id] = {
+        if (this.gameStart) {
+            throw new BadGatewayException('El juego ha comenzado')
+        }else{
+            this.connectedClients[client.id] = {
         
-            name:''
-         
-        };
+                name:'',
+                totalDeRespuestasCorrectas:0
+             
+            };
+        }
+       
     }
 
     async removeClient( clientId: string ) {
@@ -69,11 +77,24 @@ export class AuthService {
     }
 
     validateGameStart() {
-        return Object.values(this.connectedClients).every(client => client.name !== '');
+        if (!this.gameStart && Object.values(this.connectedClients).every(client => client.name !== '')) {
+            this.gameStart = true;
+            return true;
+        }
+        return false;
     }
 
     getQuestion(index:number){
         return this.questions[index];
+    }
+
+    sumatoriaPreguntas(client:Socket,valor:any,index:number){
+        //Verificar si la respuesta es correcta
+        if (this.questions[index].respuestaCorrecta===Number(valor)) {
+            this.connectedClients[client.id].totalDeRespuestasCorrectas =  this.connectedClients[client.id].totalDeRespuestasCorrectas+1;
+        }
+        return this.connectedClients;
+
     }
     
 }
