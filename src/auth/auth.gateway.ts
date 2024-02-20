@@ -10,69 +10,33 @@ export class AuthGateway implements OnGatewayConnection, OnGatewayDisconnect {
 @WebSocketServer() wss:Server // permite enviar al front
 @SubscribeMessage('message') nos permite escuchar mensajes de front 
   */
+
   @WebSocketServer() wss: Server
-
-
+  // Manejo de los clientes que se conectan
   async handleConnection(client: Socket) {
     // Handle connection event
-    await this.authService.registerClient(client);
-    this.wss.emit('clients-updated', this.authService.getConnectedClients());
+    await this.authService.registerClient(client,this.wss);
+
 
   }
 
+  // Manejo de los clientes que se desconectan
   async handleDisconnect(client: Socket) {
     // Handle disconnection event
-    await this.authService.removeClient(client.id);
-    this.wss.emit('clients-updated', this.authService.getConnectedClients());
+    await this.authService.removeClient(client.id,this.wss);
+    
   }
-
-
-
+  // Envio de nombres al cliente
   @SubscribeMessage('message')
   registerName(client: Socket, payload: any) {
-    this.authService.registerName(client, payload)
-    this.wss.emit('clients-updated', this.authService.getConnectedClients());
-
-    if (this.authService.validateGameStart()) {
-      this.question()
-    }
-
+    this.authService.registerName(client, payload,this.wss);
+  
   }
 
-
-  gameStart() {
-    return new Promise<void>((resolve, reject) => {
-      let remainingSeconds = 10;
-  
-      const countdown = () => {
-        if (remainingSeconds >= 0) {
-          this.wss.emit('gamestart', remainingSeconds);
-          remainingSeconds--;
-          setTimeout(countdown, 1000); // Espera 1 segundo antes de la próxima llamada recursiva
-        } else {
-          resolve(); // Resuelve la promesa cuando la cuenta regresiva termina
-        }
-      };
-  
-      countdown(); // Comienza la cuenta regresiva
-    });
-  }
-  
-  async question() {
-    for (let index = 0; index < 2; index++) {
-      this.indexGlobal= index;
-      this.wss.emit('question',this.authService.getQuestion(index))
-      await this.gameStart();
-       // Espera a que la cuenta regresiva actual termine antes de iniciar la siguiente
-      // Realiza otras acciones después de que la cuenta regresiva termine, si es necesario
-    }
-    this.indexGlobal=0;
-  }
   @SubscribeMessage('answer')
   answer(client: Socket, payload: any) {
+    this.authService.sumatoriaPreguntas(client,payload.name,this.indexGlobal,this.wss)
     
-    this.authService.sumatoriaPreguntas(client,payload.name,this.indexGlobal)
-    this.wss.emit('clients-updated',this.authService.getConnectedClients())
   }
 
 
