@@ -1,38 +1,46 @@
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Socket,Server} from "socket.io";
+import { Socket, Server } from "socket.io";
 import { AuthService } from './auth.service';
 
-
-@WebSocketGateway({cors:true})
+@WebSocketGateway({ cors: true })
 export class AuthGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  private indexGlobal = 0;
+  constructor(private readonly authService: AuthService) { }
+  /*
+@WebSocketServer() wss:Server // permite enviar al front
+@SubscribeMessage('message') nos permite escuchar mensajes de front 
+  */
 
-    constructor(private readonly authService: AuthService){
-
-    }
-
-    @WebSocketServer() wss:Server
- 
-    @SubscribeMessage('message')
-     registerName(client:Socket,payload:any){
-       this.authService.registerName(client,payload)
-       this.wss.emit('clients-updated', this.authService.getConnectedClients() );
-      
-    }
-  async handleConnection(client:Socket) {
+  @WebSocketServer() wss: Server
+  // Manejo de los clientes que se conectan
+  async handleConnection(client: Socket) {
     // Handle connection event
+    await this.authService.registerClient(client,this.wss);
 
-    console.log('hola pete'+ client.id)
-    await this.authService.registerClient( client );
-    this.wss.emit('clients-updated', this.authService.getConnectedClients() );
 
   }
 
+  // Manejo de los clientes que se desconectan
   async handleDisconnect(client: Socket) {
     // Handle disconnection event
-    console.log('adios pete'+ client.id)
-    await this.authService.removeClient( client.id );
-    this.wss.emit('clients-updated', this.authService.getConnectedClients() );
+    await this.authService.removeClient(client.id,this.wss);
+    
+  }
+  // Envio de nombres al cliente
+  @SubscribeMessage('message')
+  registerName(client: Socket, payload: any) {
+    this.authService.registerName(client, payload,this.wss);
+  
   }
 
-  
+  @SubscribeMessage('answer')
+  answer(client: Socket, payload: any) {
+    this.authService.sumatoriaPreguntas(client,payload.name,this.indexGlobal,this.wss)
+    
+  }
+
+
+
+
+
 }

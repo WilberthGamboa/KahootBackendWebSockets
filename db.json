@@ -1,0 +1,55 @@
+ {
+    "privateQuestions": [
+      {
+        "pregunta": "¿Qué palabra clave se utiliza para declarar una variable en JavaScript?",
+        "respuesta": [
+          "variable",
+          "var",
+          "int",
+          "let"
+        ],
+        "respuestaCorrecta": 3
+      },
+      {
+        "pregunta": "¿Cuál es el resultado de 10 * 3 en JavaScript?",
+        "respuesta": [
+          "30",
+          "13",
+          "23",
+          "10"
+        ],
+        "respuestaCorrecta": 0
+      },
+      {
+        "pregunta": "¿Cuál es el operador de igualdad estricta en JavaScript?",
+        "respuesta": [
+          "==",
+          "===",
+          "=",
+          "!="
+        ],
+        "respuestaCorrecta": 1
+      },
+      {
+        "pregunta": "¿Cómo se llama el tipo de dato que puede tener dos valores: true o false?",
+        "respuesta": [
+          "String",
+          "Boolean",
+          "Number",
+          "Undefined"
+        ],
+        "respuestaCorrecta": 1
+      },
+      {
+        "pregunta": "¿Cuál es la función para imprimir en la consola en JavaScript?",
+        "respuesta": [
+          "console.log()",
+          "print()",
+          "log()",
+          "write()"
+        ],
+        "respuestaCorrecta": 0
+      }
+    ]
+  }
+  
