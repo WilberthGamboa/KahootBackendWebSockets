@@ -5,8 +5,8 @@
 ## Description
 Backend that uses websockets for a Kahoot-style game.
 
-# FrontEnd
-[FrontEnd repository](https://github.com/WilberthGamboa/KahootFrontWebSockets)
+# Frontend
+[Frontend repository](https://github.com/WilberthGamboa/KahootFrontWebSockets)
 
 ## Installation
 
